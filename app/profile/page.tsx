@@ -6,18 +6,19 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { authService } from "@/services/auth";
 import { orderService } from "@/services/orders";
-import { 
-  User, 
-  ShoppingBag, 
-  MapPin, 
-  LogOut, 
-  Loader2, 
+import {
+  User,
+  ShoppingBag,
+  MapPin,
+  LogOut,
+  Loader2,
   ChevronRight,
   Package,
   Calendar,
   Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
 
 const statusColorMap = {
   pending: "text-amber-500 bg-amber-500/10",
@@ -41,7 +42,7 @@ export default function ProfilePage() {
       }
 
       const { data: profileData } = await authService.getProfile(session.user.id);
-      const { data: ordersData } = await orderService.getUserOrders(session.user.id);
+      const { data: ordersData } = await orderService.getUserOrders();
 
       setProfile(profileData);
       setOrders(ordersData || []);
@@ -62,7 +63,7 @@ export default function ProfilePage() {
   return (
     <main className="min-h-screen bg-background pt-32 pb-24">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           {/* Left: Profile Info */}
@@ -91,7 +92,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => authService.signOut()}
                 className="w-full bg-red-500/10 text-red-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-red-500/20 transition-all text-xs uppercase tracking-widest"
               >
@@ -99,7 +100,7 @@ export default function ProfilePage() {
               </button>
 
               {profile?.role === 'admin' && (
-                <Link 
+                <Link
                   href="/admin"
                   className="w-full bg-primary text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all text-xs uppercase tracking-widest"
                 >
@@ -120,7 +121,7 @@ export default function ProfilePage() {
               {orders.length === 0 ? (
                 <div className="bg-neutral-900 border border-white/5 p-12 rounded-2xl text-center space-y-4">
                   <p className="text-neutral-500 italic">No orders found in your curation...</p>
-                  <Button asChild variant="outline">
+                  <Button variant="outline">
                     <Link href="/shop">Explore Collection</Link>
                   </Button>
                 </div>
@@ -155,18 +156,18 @@ export default function ProfilePage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="p-6 sm:p-8 bg-white/[0.02]">
-                       <div className="flex flex-wrap gap-4">
-                          {order.order_items?.map((item: any) => (
-                            <div key={item.id} className="flex items-center gap-3">
-                               <div className="px-2 py-1 bg-black border border-white/5 rounded text-[10px] text-neutral-400">
-                                 {item.quantity}x
-                               </div>
-                               <span className="text-xs text-neutral-300">{item.products?.name}</span>
+                      <div className="flex flex-wrap gap-4">
+                        {order.order_items?.map((item: any) => (
+                          <div key={item.id} className="flex items-center gap-3">
+                            <div className="px-2 py-1 bg-black border border-white/5 rounded text-[10px] text-neutral-400">
+                              {item.quantity}x
                             </div>
-                          ))}
-                       </div>
+                            <span className="text-xs text-neutral-300">{item.products?.name}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ))
