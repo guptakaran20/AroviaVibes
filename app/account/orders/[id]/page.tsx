@@ -176,7 +176,7 @@ export default function OrderDetails() {
                     <div className="relative w-20 h-24 bg-black rounded-lg overflow-hidden flex-shrink-0">
                       {item.products ? (
                         <Image 
-                          src={item.products.image_url} 
+                          src={item.products.images?.[0] || item.products.image_url} 
                           alt={item.products.name}
                           fill
                           className="object-cover"

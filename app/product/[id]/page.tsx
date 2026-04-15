@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { Star, ShoppingBag, ArrowLeft, ShieldCheck, Truck, RotateCcw, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ProductCard } from "@/components/products/ProductCard";
+import { ProductImageGallery } from "@/components/products/ProductImageGallery";
 import { useEffect } from "react";
 
 export default function ProductDetailPage() {
@@ -79,32 +80,7 @@ export default function ProductDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
           {/* Images */}
-          <div className="space-y-4">
-            {product?.image_url ? (
-              <Image
-                src={product.image_url}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-                onError={(e) => {
-                  (e.target as any).src = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=1000";
-                }}
-              />) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
-                No Image Available
-              </div>)}
-            {product.secondary_image_url && (
-              <div className="grid grid-cols-4 gap-4">
-                <div className="relative aspect-square bg-neutral-900 border border-white/5 grayscale hover:grayscale-0 transition-all cursor-pointer">
-                  <Image src={product.image_url} alt="Thumb" fill className="object-cover" />
-                </div>
-                <div className="relative aspect-square bg-neutral-900 border border-white/5 grayscale hover:grayscale-0 transition-all cursor-pointer">
-                  <Image src={product.secondary_image_url} alt="Thumb" fill className="object-cover" />
-                </div>
-              </div>
-            )}
-          </div>
+          <ProductImageGallery images={product.images || [product.image_url, product.secondary_image_url].filter(Boolean) as string[]} />
 
           {/* Details */}
           <div className="flex flex-col">

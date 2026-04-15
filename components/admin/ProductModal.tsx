@@ -31,19 +31,18 @@ export const ProductModal = ({ isOpen, onClose, product, onSuccess }: ProductMod
     cod_charges: 0,
   });
 
-  const [mainImage, setMainImage] = useState<File | null>(null);
-  const [secondaryImage, setSecondaryImage] = useState<File | null>(null);
-  const [mainPreview, setMainPreview] = useState<string>("");
-  const [secondaryPreview, setSecondaryPreview] = useState<string>("");
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
-  const mainInputRef = useRef<HTMLInputElement>(null);
-  const secondaryInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (product) {
       setFormData(product);
-      setMainPreview(product.image_url || "");
-      setSecondaryPreview(product.secondary_image_url || "");
+      setExistingImages(product.images || [product.image_url, product.secondary_image_url].filter(Boolean) as string[]);
+      setPreviews([]);
+      setNewImageFiles([]);
     } else {
       setFormData({
         name: "",
@@ -58,43 +57,57 @@ export const ProductModal = ({ isOpen, onClose, product, onSuccess }: ProductMod
         is_active: true,
         cod_charges: 0,
       });
-      setMainPreview("");
-      setSecondaryPreview("");
+      setExistingImages([]);
+      setPreviews([]);
+      setNewImageFiles([]);
     }
-    setMainImage(null);
-    setSecondaryImage(null);
   }, [product, isOpen]);
 
-const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-) => {
-  const { name, value, type } = e.target;
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target;
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]:
-      type === "number"
-        ? value === "" // 👈 IMPORTANT FIX
-          ? 0
-          : parseFloat(value)
-        : value,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        type === "number"
+          ? value === "" 
+            ? 0
+            : parseFloat(value)
+          : value,
+    }));
+  };
+
   const handleToggle = (field: "is_featured" | "is_active") => {
     setFormData(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, type: "main" | "secondary") => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (type === "main") {
-        setMainImage(file);
-        setMainPreview(URL.createObjectURL(file));
-      } else {
-        setSecondaryImage(file);
-        setSecondaryPreview(URL.createObjectURL(file));
-      }
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const totalCount = existingImages.length + newImageFiles.length + files.length;
+
+    if (totalCount > 5) {
+      alert("Maximum 5 images allowed per product");
+      return;
     }
+
+    const newPreviews = files.map(file => URL.createObjectURL(file));
+    setNewImageFiles(prev => [...prev, ...files]);
+    setPreviews(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeNewImage = (index: number) => {
+    setNewImageFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviews(prev => {
+      const newPreviews = [...prev];
+      URL.revokeObjectURL(newPreviews[index]);
+      return newPreviews.filter((_, i) => i !== index);
+    });
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,19 +116,16 @@ const handleChange = (
 
     try {
       if (product?.id) {
-        // Update product with optional new images
         await productService.updateProduct(
           product.id, 
           formData,
-          mainImage || undefined,
-          secondaryImage || undefined
+          newImageFiles,
+          existingImages
         );
       } else {
-        // Create product
         await productService.createProduct(
           formData,
-          mainImage || undefined,
-          secondaryImage || undefined
+          newImageFiles
         );
       }
       onSuccess();
@@ -312,67 +322,90 @@ const handleChange = (
             </div>
 
             {/* Images */}
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-[10px] uppercase tracking-[0.2em] text-neutral-500 mb-2">Main Image</label>
-                <div 
-                  onClick={() => mainInputRef.current?.click()}
-                  className="group relative aspect-square bg-black border-2 border-dashed border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-primary/50 transition-colors flex flex-col items-center justify-center gap-2"
-                >
-                  {mainPreview ? (
-                    <>
-                      <img src={mainPreview} alt="Preview" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Upload className="w-6 h-6 text-white" />
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="p-3 bg-white/5 rounded-full text-neutral-500 group-hover:text-primary transition-colors">
-                        <ImageIcon className="w-6 h-6" />
-                      </div>
-                      <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Click to upload</span>
-                    </>
-                  )}
-                  <input 
-                    type="file" 
-                    ref={mainInputRef}
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={(e) => handleImageChange(e, "main")}
-                  />
-                </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="block text-[10px] uppercase tracking-[0.2em] text-neutral-500">Product Gallery (Max 5)</label>
+                <span className="text-[10px] text-neutral-500 uppercase tracking-widest">
+                  {existingImages.length + newImageFiles.length} / 5 Images
+                </span>
               </div>
-              <div>
-                <label className="block text-[10px] uppercase tracking-[0.2em] text-neutral-500 mb-2">Secondary Image</label>
-                <div 
-                  onClick={() => secondaryInputRef.current?.click()}
-                  className="group relative aspect-square bg-black border-2 border-dashed border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-primary/50 transition-colors flex flex-col items-center justify-center gap-2"
-                >
-                  {secondaryPreview ? (
-                    <>
-                      <img src={secondaryPreview} alt="Preview" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Upload className="w-6 h-6 text-white" />
+              
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                {/* Existing Images */}
+                {existingImages.map((url, index) => (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    key={`existing-${index}`} 
+                    className="relative aspect-square rounded-xl overflow-hidden group border border-white/5 bg-black"
+                  >
+                    <img src={url} alt="Product" className="w-full h-full object-cover" />
+                    <button 
+                      type="button"
+                      onClick={() => removeExistingImage(index)}
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 hover:bg-red-500/80"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                    {index === 0 && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-primary/80 py-1 text-[8px] text-black font-bold text-center uppercase tracking-tighter">
+                        Main
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="p-3 bg-white/5 rounded-full text-neutral-500 group-hover:text-primary transition-colors">
-                        <ImageIcon className="w-6 h-6" />
-                      </div>
-                      <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Click to upload</span>
-                    </>
-                  )}
-                  <input 
-                    type="file" 
-                    ref={secondaryInputRef}
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={(e) => handleImageChange(e, "secondary")}
-                  />
-                </div>
+                    )}
+                  </motion.div>
+                ))}
+
+                {/* New Previews */}
+                {previews.map((preview, index) => (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    key={`new-${index}`} 
+                    className="relative aspect-square rounded-xl overflow-hidden group border border-white/5 bg-black"
+                  >
+                    <img src={preview} alt="Upload Preview" className="w-full h-full object-cover opacity-70" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                       <div className="w-2 h-2 bg-primary animate-ping rounded-full" />
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => removeNewImage(index)}
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition-all border border-white/10 hover:bg-red-500/80"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </motion.div>
+                ))}
+
+                {/* Upload Placeholder */}
+                {(existingImages.length + newImageFiles.length) < 5 && (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="aspect-square bg-black border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                  >
+                    <div className="p-2 bg-white/5 rounded-full text-neutral-500 group-hover:text-primary transition-colors">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] text-neutral-500 uppercase tracking-widest font-medium">Add Image</span>
+                  </button>
+                )}
               </div>
+
+              <input 
+                 type="file" 
+                 ref={fileInputRef}
+                 multiple
+                 className="hidden"
+                 accept="image/*"
+                 onChange={handleImageChange}
+              />
+              
+              <p className="text-[10px] text-neutral-500 leading-relaxed uppercase tracking-wider">
+                Tip: The first image will be used as the primary display. Recommended aspect ratio 4:5.
+              </p>
             </div>
           </div>
 

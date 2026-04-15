@@ -61,7 +61,7 @@ export default function CartPage() {
               >
                 <div className="relative w-32 aspect-[4/5] bg-neutral-900 border border-white/5 flex-shrink-0">
                   <Image 
-                    src={item.image_url} 
+                    src={item.images?.[0] || item.image_url} 
                     alt={item.name} 
                     fill 
                     className="object-cover" 

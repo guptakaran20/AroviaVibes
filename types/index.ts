@@ -9,6 +9,7 @@ export interface Product {
   category: 'Men' | 'Women' | 'Unisex';
   image_url: string;
   secondary_image_url?: string;
+  images: string[];
   rating: number;
   stock: number;
   is_new?: boolean;

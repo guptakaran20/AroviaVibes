@@ -29,16 +29,16 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-neutral-900 border border-white/5">
         <Link href={`/product/${product.id}`}>
-          {product.image_url ? (
+          {/* Main Image */}
+          {(product.images?.[0] || product.image_url) ? (
             <Image
-              src={product.image_url}
+              src={product.images?.[0] || product.image_url}
               alt={product.name}
               fill
               className={cn(
                 "object-cover transition-transform duration-700 group-hover:scale-110",
-                isHovered && product.secondary_image_url ? "opacity-0" : "opacity-100"
+                isHovered && (product.images?.[1] || product.secondary_image_url) ? "opacity-0" : "opacity-100"
               )}
-              // Fallback for missing images
               onError={(e) => {
                 (e.target as any).src = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=1000";
               }}
@@ -48,17 +48,22 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             </div>
           )}
 
-          {product.secondary_image_url && (
-            <Image
-              src={product.secondary_image_url}
-              alt={product.name}
-              fill
-              className={cn(
-                "object-cover transition-all duration-700 group-hover:scale-110",
-                isHovered ? "opacity-100 scale-110" : "opacity-0"
-              )}
-            />
-          )}
+          {/* Hover Image */}
+          {(() => {
+            const hoverImage = product.images?.[1] || product.secondary_image_url;
+            if (!hoverImage) return null;
+            return (
+              <Image
+                src={hoverImage}
+                alt={product.name}
+                fill
+                className={cn(
+                  "object-cover transition-all duration-700 group-hover:scale-110",
+                  isHovered ? "opacity-100 scale-110" : "opacity-0"
+                )}
+              />
+            );
+          })()}
         </Link>
 
         {/* Badges */}

@@ -6,23 +6,29 @@ const sanitizePath = (name: string) => {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
 }
 
-const uploadProductImage = async (productName: string, file: File, type: 'main' | 'secondary') => {
+const uploadMultipleImages = async (productName: string, files: File[]) => {
   const supabase = createClient()
   const folder = sanitizePath(productName)
-  const fileName = `${Date.now()}-${type}.jpg`
-  const path = `${folder}/${fileName}`
+  const timestamp = Date.now()
+  
+  const uploadPromises = files.map(async (file, index) => {
+    const fileName = `${timestamp}-${index}.jpg`
+    const path = `${folder}/${fileName}`
 
-  const { data, error } = await supabase.storage
-    .from('products')
-    .upload(path, file)
+    const { error } = await supabase.storage
+      .from('products')
+      .upload(path, file)
 
-  if (error) {
-    console.error(`Error uploading ${type} image:`, error)
-    throw new Error(`Failed to upload ${type} image: ${error.message}`)
-  }
+    if (error) {
+      console.error(`Error uploading image ${index}:`, error)
+      throw new Error(`Failed to upload image ${index}: ${error.message}`)
+    }
 
-  const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(path)
-  return publicUrl
+    const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(path)
+    return publicUrl
+  })
+
+  return Promise.all(uploadPromises)
 }
 
 export const productService = {
@@ -88,16 +94,12 @@ export const productService = {
     return data as Product
   },
 
-  async createProduct(product: Partial<Product>, imageFile?: File, secondaryImageFile?: File) {
-    let imageUrl = product.image_url
-    let secondaryImageUrl = product.secondary_image_url
+  async createProduct(product: Partial<Product>, imageFiles: File[]) {
+    let images: string[] = []
 
     try {
-      if (imageFile) {
-        imageUrl = await uploadProductImage(product.name || 'unnamed', imageFile, 'main')
-      }
-      if (secondaryImageFile) {
-        secondaryImageUrl = await uploadProductImage(product.name || 'unnamed', secondaryImageFile, 'secondary')
+      if (imageFiles && imageFiles.length > 0) {
+        images = await uploadMultipleImages(product.name || 'unnamed', imageFiles)
       }
     } catch (err: any) {
       toast.error(err.message)
@@ -109,8 +111,9 @@ export const productService = {
       .from('products')
       .insert([{
         ...product,
-        image_url: imageUrl,
-        secondary_image_url: secondaryImageUrl,
+        images,
+        image_url: images[0] || '',
+        secondary_image_url: images[1] || '',
         slug: product.name ? sanitizePath(product.name) : `prod-${Date.now()}`,
         is_active: product.is_active ?? true
       }])
@@ -127,16 +130,13 @@ export const productService = {
     return data as Product
   },
 
-  async updateProduct(id: string, updates: Partial<Product>, imageFile?: File, secondaryImageFile?: File) {
-    let imageUrl = updates.image_url
-    let secondaryImageUrl = updates.secondary_image_url
+  async updateProduct(id: string, updates: Partial<Product>, newImageFiles: File[], currentImages: string[] = []) {
+    let images = [...currentImages]
 
     try {
-      if (imageFile) {
-        imageUrl = await uploadProductImage(updates.name || 'updated', imageFile, 'main')
-      }
-      if (secondaryImageFile) {
-        secondaryImageUrl = await uploadProductImage(updates.name || 'updated', secondaryImageFile, 'secondary')
+      if (newImageFiles && newImageFiles.length > 0) {
+        const newUrls = await uploadMultipleImages(updates.name || 'updated', newImageFiles)
+        images = [...images, ...newUrls]
       }
     } catch (err: any) {
       toast.error(err.message)
@@ -148,8 +148,9 @@ export const productService = {
       .from('products')
       .update({
         ...updates,
-        ...(imageUrl && { image_url: imageUrl }),
-        ...(secondaryImageUrl && { secondary_image_url: secondaryImageUrl }),
+        images,
+        image_url: images[0] || updates.image_url,
+        secondary_image_url: images[1] || updates.secondary_image_url,
         is_active: updates.is_active ?? true,
         cod_charges: updates.cod_charges ?? 0
       })
