@@ -6,17 +6,24 @@ import { Search, ShoppingBag, Menu, X, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { authService } from "@/services/auth";
 
 export const Navbar = () => {
   const { cartCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
+    
+    authService.getSession().then(({ data }) => {
+      setSession(data.session);
+    });
+
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -49,6 +56,9 @@ export const Navbar = () => {
           <Link href="/shop?category=Women" className="text-sm uppercase tracking-widest hover:text-primary transition-colors">
             Women
           </Link>
+          <Link href="/shop?category=Unisex" className="text-sm uppercase tracking-widest hover:text-primary transition-colors">
+            Unisex
+          </Link>
         </div>
 
         {/* Logo */}
@@ -65,10 +75,7 @@ export const Navbar = () => {
 
         {/* Actions */}
         <div className="flex items-center space-x-6">
-          <button className="hidden md:block hover:text-primary transition-colors">
-            <Search className="w-5 h-5" />
-          </button>
-          <Link href="/login" className="hidden md:block hover:text-primary transition-colors">
+          <Link href={session ? "/account" : "/login"} className="hidden md:block hover:text-primary transition-colors">
             <User className="w-5 h-5" />
           </Link>
           <Link href="/cart" className="relative hover:text-primary transition-colors">
@@ -114,10 +121,14 @@ export const Navbar = () => {
                 <Link href="/shop?category=Unisex" onClick={() => setIsMobileMenuOpen(false)} className="text-lg uppercase tracking-widest">Unisex</Link>
               </div>
               <div className="mt-auto border-t border-white/10 pt-8 space-y-4">
-                <div className="flex items-center space-x-4 uppercase tracking-widest text-sm text-neutral-400">
+                <Link 
+                  href={session ? "/account" : "/login"} 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center space-x-4 uppercase tracking-widest text-sm text-neutral-400 hover:text-primary transition-colors"
+                >
                   <User className="w-5 h-5" />
-                  <span>My Account</span>
-                </div>
+                  <span>{session ? "My Account" : "Login"}</span>
+                </Link>
               </div>
             </motion.div>
           </>

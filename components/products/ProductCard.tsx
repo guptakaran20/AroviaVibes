@@ -29,22 +29,28 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-neutral-900 border border-white/5">
         <Link href={`/product/${product.id}`}>
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className={cn(
-              "object-cover transition-transform duration-700 group-hover:scale-110",
-              isHovered && product.secondaryImage ? "opacity-0" : "opacity-100"
-            )}
-            // Fallback for missing images
-            onError={(e) => {
-              (e.target as any).src = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=1000";
-            }}
-          />
-          {product.secondaryImage && (
+          {product.image_url ? (
             <Image
-              src={product.secondaryImage}
+              src={product.image_url}
+              alt={product.name}
+              fill
+              className={cn(
+                "object-cover transition-transform duration-700 group-hover:scale-110",
+                isHovered && product.secondary_image_url ? "opacity-0" : "opacity-100"
+              )}
+              // Fallback for missing images
+              onError={(e) => {
+                (e.target as any).src = "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&q=80&w=1000";
+              }}
+            />) : (
+            <div className="w-full h-full flex items-center justify-center text-neutral-700">
+              No Image
+            </div>
+          )}
+
+          {product.secondary_image_url && (
+            <Image
+              src={product.secondary_image_url}
               alt={product.name}
               fill
               className={cn(
@@ -57,7 +63,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
         {/* Badges */}
         <div className="absolute top-4 left-4 space-y-2">
-          {product.isNew && (
+          {product.is_new && (
             <span className="bg-primary text-background text-[10px] uppercase tracking-widest px-3 py-1 font-bold">
               New Arrival
             </span>
@@ -98,9 +104,9 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           <span className="text-sm font-bold text-foreground">
             {formatCurrency(product.price)}
           </span>
-          {product.oldPrice && (
+          {product.discount_price && (
             <span className="text-xs text-neutral-500 line-through">
-              {formatCurrency(product.oldPrice)}
+              {formatCurrency(product.discount_price)}
             </span>
           )}
         </div>

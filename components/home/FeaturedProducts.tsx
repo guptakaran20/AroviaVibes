@@ -1,13 +1,29 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ProductCard } from "../products/ProductCard";
-import productsData from "@/lib/data.json";
 import { Product } from "@/types";
-import { motion } from "framer-motion";
+import { productService } from "@/services/products";
+import { Loader2 } from "lucide-react";
 
 export const FeaturedProducts = () => {
-  const featuredProducts = productsData.slice(0, 4) as Product[];
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const data = await productService.getFeaturedProducts();
+        setFeaturedProducts(data.slice(0, 4));
+      } catch (error) {
+        console.error("Error loading featured products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
 
   return (
     <section className="py-24 bg-background">
@@ -27,11 +43,22 @@ export const FeaturedProducts = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-neutral-900/50 rounded-3xl border border-white/5">
+            <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
+            <p className="text-neutral-500 font-serif italic">Curating excellence...</p>
+          </div>
+        ) : featuredProducts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 border border-dashed border-white/10 rounded-3xl">
+             <p className="text-neutral-500 italic">No featured products available at the moment.</p>
+          </div>
+        )}
       </div>
     </section>
   );

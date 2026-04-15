@@ -1,16 +1,20 @@
 export interface Product {
   id: string;
   name: string;
+  slug: string;
   brand: string;
   description: string;
   price: number;
-  oldPrice?: number;
+  discount_price?: number;
   category: 'Men' | 'Women' | 'Unisex';
-  image: string;
-  secondaryImage?: string;
+  image_url: string;
+  secondary_image_url?: string;
   rating: number;
   stock: number;
-  isNew?: boolean;
+  is_new?: boolean;
+  is_featured?: boolean;
+  is_active?: boolean;
+  cod_charges?: number;
 }
 
 export interface CartItem extends Product {

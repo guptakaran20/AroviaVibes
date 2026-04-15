@@ -25,9 +25,7 @@ export const Footer = () => {
               exquisite fragrances, curated for the modern connoisseur.
             </p>
             <div className="flex items-center space-x-4">
-              <Link href="#" className="hover:text-primary"><FaInstagram className="w-5 h-5" /></Link>
-              <Link href="#" className="hover:text-primary"><FaFacebook className="w-5 h-5" /></Link>
-              <Link href="#" className="hover:text-primary"><FaTwitter className="w-5 h-5" /></Link>
+              <Link href="https://www.instagram.com/arovia.vibes/" className="hover:text-primary"><FaInstagram className="w-5 h-5" /></Link>
             </div>
           </div>
 
@@ -46,10 +44,9 @@ export const Footer = () => {
           <div className="space-y-6">
             <h4 className="text-sm uppercase tracking-widest font-bold text-primary">Support</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-premium">Contact Us</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-premium">Shipping & Returns</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-premium">Privacy Policy</Link></li>
-              <li><Link href="#" className="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-premium">FAQs</Link></li>
+              <li><Link href="/shipping-returns" className="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-premium">Shipping & Returns</Link></li>
+              <li><Link href="/privacy-policy" className="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-premium">Privacy Policy</Link></li>
+              <li><Link href="/faq" className="text-neutral-400 hover:text-white transition-colors text-sm uppercase tracking-premium">FAQs</Link></li>
             </ul>
           </div>
 
@@ -66,11 +63,7 @@ export const Footer = () => {
         </div>
 
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-xs text-neutral-500 uppercase tracking-widest">
-          <p>© 2024 Arovia Vibes. All rights reserved.</p>
-          <div className="flex space-x-8">
-            <span>Powered by Premium Tech</span>
-            <span>Designed in France</span>
-          </div>
+          <p>© 2026 Arovia Vibes. All rights reserved.</p>
         </div>
       </div>
     </footer>

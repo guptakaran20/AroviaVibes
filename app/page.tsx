@@ -30,11 +30,7 @@ export default function Home() {
               </div>
             </div>
             <div className="relative h-[500px] md:h-[700px]">
-              <img 
-                src="https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?auto=format&fit=crop&q=80&w=1000" 
-                alt="Perfume Gift Set"
-                className="w-full h-full object-cover rounded-sm"
-              />
+              <iframe src='https://my.spline.design/theperfume-YZaNL4Lw473ywUAmmjU0dRBJ/' width='100%' height='100%'></iframe>
             </div>
           </div>
         </div>

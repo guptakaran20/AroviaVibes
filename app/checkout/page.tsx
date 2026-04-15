@@ -1,20 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useCart } from "@/context/CartContext";
-import { useOrders } from "@/context/OrderContext";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { ShieldCheck, Truck, CreditCard, Banknote } from "lucide-react";
+import { ShieldCheck, Truck, CreditCard, Banknote, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { orderService } from "@/services/orders";
+import { authService } from "@/services/auth";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, cartTotal, clearCart } = useCart();
-  const { createOrder } = useOrders();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -23,29 +25,67 @@ export default function CheckoutPage() {
     paymentMethod: "COD" as "COD" | "UPI",
   });
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await authService.getSession();
+      if (!session) {
+        toast.error("Please login to complete your order");
+        router.push(`/login?redirect=/checkout`);
+        return;
+      }
+      setUserId(session.user.id);
+      
+      // Auto-fill name if profile exists
+      const { data: profile } = await authService.getProfile(session.user.id);
+      if (profile?.name) {
+        setFormData(prev => ({ ...prev, name: profile.name }));
+      }
+    };
+    checkAuth();
+  }, [router]);
+
   if (cart.length === 0) {
     if (typeof window !== "undefined") router.push("/shop");
     return null;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const codChargesTotal = cart.reduce((sum, item) => sum + (Number(item.cod_charges) || 0) * item.quantity, 0);
+  const finalTotal = formData.paymentMethod === "COD" ? cartTotal + codChargesTotal : cartTotal;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!userId) {
+      toast.error("Authentication required");
+      router.push("/login");
+      return;
+    }
+
     if (!formData.name || !formData.phone || !formData.address) {
       toast.error("Please provide all delivery details");
       return;
     }
 
-    const order = createOrder({
+    setIsSubmitting(true);
+
+    const { data: order, error } = await orderService.createOrder({
+      user_id: userId,
+      customer_name: formData.name,
+      phone: formData.phone,
+      address: formData.address,
+      payment_method: formData.paymentMethod,
+      total_amount: finalTotal,
       items: cart,
-      total: cartTotal,
-      customer: formData,
     });
 
-    toast.success("Order placed successfully!");
-    clearCart();
-    router.push(`/order-confirmation/${order.id}`);
+    setIsSubmitting(false);
+
+    if (!error && order) {
+      clearCart();
+      router.push(`/order-confirmation?tracking=${order.tracking_id}`);
+    }
   };
+
 
   return (
     <main className="min-h-screen bg-background pt-32 pb-24">
@@ -154,11 +194,23 @@ export default function CheckoutPage() {
               </div>
 
               <div className="pt-8 border-t border-white/10 space-y-4">
-                 <div className="flex justify-between text-lg uppercase tracking-luxury font-bold">
-                   <span>Total</span>
-                   <span className="text-primary">{formatCurrency(cartTotal)}</span>
+                 <div className="flex justify-between text-xs uppercase tracking-widest text-neutral-500">
+                   <span>Subtotal</span>
+                   <span>{formatCurrency(cartTotal)}</span>
                  </div>
-                 <p className="text-[10px] text-neutral-500 uppercase tracking-widest italic text-center">Price including all applicable luxury taxes</p>
+                 
+                 {formData.paymentMethod === "COD" && codChargesTotal > 0 && (
+                   <div className="flex justify-between text-xs uppercase tracking-widest text-primary animate-in fade-in slide-in-from-top-1 duration-300">
+                     <span>COD Convenience Fee</span>
+                     <span>+ {formatCurrency(codChargesTotal)}</span>
+                   </div>
+                 )}
+
+                 <div className="flex justify-between text-lg uppercase tracking-luxury font-bold pt-2 border-t border-white/5">
+                   <span>Total</span>
+                   <span className="text-primary">{formatCurrency(finalTotal)}</span>
+                 </div>
+                 <p className="text-[10px] text-neutral-500 uppercase tracking-widest italic text-center">Tax and shipping included</p>
               </div>
 
               <Button type="submit" className="w-full h-14 flex items-center justify-center space-x-3" size="lg">

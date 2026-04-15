@@ -138,5 +138,33 @@
     "rating": 5,
     "stock": 12,
     "isNew": true
+  },
+  {
+    "id": "11",
+    "name": "Tom Ford Unisex Tobacco Vanille",
+    "brand": "Tom Ford",
+    "description": "An opulent, warm and iconic fragrance. A modern take on an old-world apothecary tradition.",
+    "price": 15000,
+    "oldPrice": 16500,
+    "category": "Unisex",
+    "image": "/images/products/Unisex/1-1.png",
+    "secondaryImage": "/images/products/Unisex/1-2.png",
+    "rating": 5,
+    "stock": 5,
+    "isNew": true
+  },
+  {
+    "id": "12",
+    "name": "Byredo Unisex Gypsy Water",
+    "brand": "Byredo",
+    "description": "An ode to the beauty of Romani culture, its unique customs, intimate beliefs and distinguished way of living.",
+    "price": 12000,
+    "oldPrice": 13000,
+    "category": "Unisex",
+    "image": "/images/products/Unisex/2-1.png",
+    "secondaryImage": "/images/products/Unisex/2-2.png",
+    "rating": 5,
+    "stock": 8,
+    "isNew": false
   }
 ]
