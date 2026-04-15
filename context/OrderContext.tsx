@@ -16,7 +16,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const savedOrders = localStorage.getItem("arovia-orders");
+    const savedOrders = localStorage.getItem("arovia-vibes-orders");
     if (savedOrders) {
       try {
         setOrders(JSON.parse(savedOrders));
@@ -29,7 +29,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem("arovia-orders", JSON.stringify(orders));
+      localStorage.setItem("arovia-vibes-orders", JSON.stringify(orders));
     }
   }, [orders, isInitialized]);
 

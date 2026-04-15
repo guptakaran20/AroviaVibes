@@ -108,7 +108,7 @@ export const Navbar = () => {
               className="fixed top-0 left-0 bottom-0 w-[80%] bg-neutral-900 z-50 p-8 flex flex-col lg:hidden"
             >
               <div className="flex justify-between items-center mb-12">
-                <span className="text-xl font-serif tracking-widest">AROVIA</span>
+                <span className="text-xl font-serif tracking-widest">AROVIA VIBES</span>
                 <button onClick={() => setIsMobileMenuOpen(false)}>
                   <X className="w-6 h-6" />
                 </button>

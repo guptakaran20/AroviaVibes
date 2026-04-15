@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center justify-between mb-12">
             <Link href="/" className="text-xl font-serif tracking-tight flex items-center gap-2">
-              <span className="text-primary italic">Arovia</span> Admin
+              <span className="text-primary italic whitespace-nowrap">Arovia Vibes</span> Admin
             </Link>
             <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-neutral-500">
               <X className="w-6 h-6" />

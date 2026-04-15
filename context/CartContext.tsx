@@ -22,7 +22,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem("arovia-cart");
+    const savedCart = localStorage.getItem("arovia-vibes-cart");
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -36,7 +36,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Save cart to localStorage on change
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem("arovia-cart", JSON.stringify(cart));
+      localStorage.setItem("arovia-vibes-cart", JSON.stringify(cart));
     }
   }, [cart, isInitialized]);
 
