@@ -9,10 +9,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "phjyigduhgfthqkyhigz.supabase.co",
+        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
       },
     ],
   },
-};
+};  
 
 export default nextConfig;

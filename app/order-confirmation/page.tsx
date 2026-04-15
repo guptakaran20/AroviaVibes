@@ -151,7 +151,7 @@ export default function OrderConfirmationPage() {
         </div>
 
         <div className="text-center">
-           <Button size="lg" asChild>
+           <Button size="lg">
               <Link href="/shop">Continue Curation</Link>
            </Button>
         </div>
