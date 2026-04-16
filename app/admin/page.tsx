@@ -6,12 +6,10 @@ import {
   ShoppingBag, 
   Users, 
   DollarSign,
-  ArrowUpRight,
-  ArrowDownRight,
   Clock,
   Package
 } from "lucide-react";
-import { orderService } from "@/services/orders";
+import { getRevenueStats, getAllOrders } from "@/services/orders";
 import { productService } from "@/services/products";
 
 export default function AdminDashboard() {
@@ -25,11 +23,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const revenue = await orderService.getRevenueStats();
-      const { data: orders } = await orderService.getAllOrders();
+      const revenue = await getRevenueStats();
+      const { data: orders } = await getAllOrders();
       const products = await productService.getProducts();
       
-      const pending = orders?.filter(o => o.order_status === 'pending').length || 0;
+      const pending = orders?.filter((o: any) => o.order_status === 'pending').length || 0;
 
       setStats({
         totalRevenue: revenue,
@@ -112,7 +110,6 @@ export default function AdminDashboard() {
                 />
               </div>
             </div>
-            {/* Add more distribution items if needed */}
           </div>
         </div>
       </div>

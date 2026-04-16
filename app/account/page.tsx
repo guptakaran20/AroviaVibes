@@ -1,57 +1,67 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { authService } from "@/services/auth";
-import { orderService } from "@/services/orders";
-import { 
-  ShoppingBag, 
-  User, 
-  ChevronRight, 
-  Package, 
+import { getUserOrders } from "@/services/orders";
+import { ensureProfile, signOut, getSession } from "@/services/auth";
+import {
+  ShoppingBag,
+  User,
+  ChevronRight,
+  Package,
   LogOut,
-  Clock
+  Clock,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { StatusBadge } from "@/components/account/StatusBadge";
-import { Loader2 } from "lucide-react";
 
 export default function AccountDashboard() {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [stats, setStats] = useState({ totalOrders: 0, lastOrder: null as any });
+  const [stats, setStats] = useState({
+    totalOrders: 0,
+    lastOrder: null as any,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: { session } } = await authService.getSession();
+      const { data: { session } } = await getSession();
+
       if (!session) {
         window.location.href = "/login";
         return;
       }
+
       setUser(session.user);
-      
+
+      // Fetch user profile and orders
+      // Use ensureProfile to help self-heal if profile record is missing
       const [profileRes, ordersRes] = await Promise.all([
-        authService.getProfile(session.user.id),
-        orderService.getUserOrders(1, 1) // Get just the latest one
+        ensureProfile(session.user.id, session.user.user_metadata),
+        getUserOrders(1, 100)
       ]);
 
       setProfile(profileRes.data);
       
-      // Get total count separately or from ordersRes if it returned metadata
-      // For now, let's just fetch all to get count (not ideal but works for now)
-      const { data: allOrders } = await orderService.getUserOrders(1, 100);
-      
+      const orders = ordersRes.data || [];
       setStats({
-        totalOrders: allOrders?.length || 0,
-        lastOrder: allOrders?.[0] || null
+        totalOrders: orders.length,
+        lastOrder: orders[0] || null,
       });
-      
+
       setLoading(false);
     };
+
     fetchData();
   }, []);
+
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = "/login";
+  };
 
   if (loading) {
     return (
@@ -61,41 +71,63 @@ export default function AccountDashboard() {
     );
   }
 
+  const displayName = profile?.name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email;
+
   return (
     <main className="min-h-screen bg-background pt-32 pb-24">
       <Navbar />
-      
+
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-16">
           <h1 className="text-5xl font-serif mb-4 tracking-tight">
             My <span className="text-primary italic">Account</span>
           </h1>
           <p className="text-neutral-500 text-sm uppercase tracking-widest">
-            Welcome back, {profile?.name || user?.email}
+            Welcome back, {displayName}
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Sidebar Nav */}
+          {/* Sidebar */}
           <div className="lg:col-span-3 space-y-2">
-            <Link href="/account" className="flex items-center space-x-3 p-4 bg-primary text-black rounded-xl font-bold transition-all">
+            <Link
+              href="/account"
+              className="flex items-center space-x-3 p-4 bg-primary text-black rounded-xl font-bold"
+            >
               <User className="w-5 h-5" />
-              <span className="text-sm uppercase tracking-widest">Overview</span>
+              <span className="text-sm uppercase tracking-widest">
+                Overview
+              </span>
             </Link>
-            <Link href="/account/orders" className="flex items-center space-x-3 p-4 hover:bg-white/5 rounded-xl transition-all group">
+
+            <Link
+              href="/account/orders"
+              className="flex items-center space-x-3 p-4 hover:bg-white/5 rounded-xl transition-all group"
+            >
               <ShoppingBag className="w-5 h-5 text-neutral-500 group-hover:text-primary" />
-              <span className="text-sm uppercase tracking-widest text-neutral-400 group-hover:text-white">My Orders</span>
+              <span className="text-sm uppercase tracking-widest text-neutral-400 group-hover:text-white">
+                My Orders
+              </span>
             </Link>
-            <Link href="/account/profile" className="flex items-center space-x-3 p-4 hover:bg-white/5 rounded-xl transition-all group">
+
+            <Link
+              href="/account/profile"
+              className="flex items-center space-x-3 p-4 hover:bg-white/5 rounded-xl transition-all group"
+            >
               <Package className="w-5 h-5 text-neutral-500 group-hover:text-primary" />
-              <span className="text-sm uppercase tracking-widest text-neutral-400 group-hover:text-white">Profile</span>
+              <span className="text-sm uppercase tracking-widest text-neutral-400 group-hover:text-white">
+                Profile
+              </span>
             </Link>
-            <button 
-              onClick={() => authService.signOut()}
+
+            <button
+              onClick={handleLogout}
               className="w-full flex items-center space-x-3 p-4 hover:bg-red-500/10 rounded-xl transition-all group mt-8"
             >
               <LogOut className="w-5 h-5 text-neutral-500 group-hover:text-red-500" />
-              <span className="text-sm uppercase tracking-widest text-neutral-400 group-hover:text-red-500">Sign Out</span>
+              <span className="text-sm uppercase tracking-widest text-neutral-400 group-hover:text-red-500">
+                Sign Out
+              </span>
             </button>
           </div>
 
@@ -108,7 +140,9 @@ export default function AccountDashboard() {
                   <ShoppingBag className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">Total Orders</p>
+                  <p className="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">
+                    Total Orders
+                  </p>
                   <p className="text-3xl font-bold">{stats.totalOrders}</p>
                 </div>
               </div>
@@ -119,13 +153,18 @@ export default function AccountDashboard() {
                   <Clock className="w-6 h-6 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">Latest Order</p>
+                  <p className="text-neutral-500 text-[10px] uppercase tracking-widest font-bold">
+                    Latest Order
+                  </p>
                   {stats.lastOrder ? (
-                    <div className="mt-2">
-                       <StatusBadge status={stats.lastOrder.order_status} />
+                    <div className="mt-2 text-sm text-neutral-400 flex items-center gap-3">
+                      <StatusBadge status={stats.lastOrder.order_status} />
+                      <span>{new Date(stats.lastOrder.created_at).toLocaleDateString()}</span>
                     </div>
                   ) : (
-                    <p className="text-neutral-400 text-sm mt-1">No orders yet</p>
+                    <p className="text-neutral-400 text-sm mt-1">
+                      No orders yet
+                    </p>
                   )}
                 </div>
               </div>
@@ -134,16 +173,20 @@ export default function AccountDashboard() {
             {/* Recent Order Preview */}
             {stats.lastOrder && (
               <div className="bg-neutral-900 border border-white/5 rounded-2xl overflow-hidden">
-                <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
                   <h3 className="text-lg font-serif">Recent Order</h3>
-                  <Link href="/account/orders" className="text-[10px] uppercase tracking-widest text-primary hover:underline flex items-center">
+                  <Link
+                    href="/account/orders"
+                    className="text-[10px] uppercase tracking-widest text-primary hover:underline flex items-center"
+                  >
                     View All <ChevronRight className="w-3 h-3 ml-1" />
                   </Link>
                 </div>
+
                 <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Order ID</p>
-                    <p className="text-sm font-bold tracking-widest">{stats.lastOrder.tracking_id}</p>
+                    <p className="text-sm font-bold tracking-widest uppercase">{stats.lastOrder.tracking_id}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Date</p>
@@ -153,9 +196,9 @@ export default function AccountDashboard() {
                     <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Total</p>
                     <p className="text-sm font-bold">₹{stats.lastOrder.total_amount}</p>
                   </div>
-                  <Link 
+                  <Link
                     href={`/account/orders/${stats.lastOrder.id}`}
-                    className="bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl text-[10px] uppercase tracking-widest font-bold transition-all"
+                    className="bg-white/5 hover:bg-white/10 px-6 py-3 rounded-xl text-[10px] uppercase tracking-widest font-bold transition-all text-center"
                   >
                     View Details
                   </Link>

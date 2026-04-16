@@ -4,18 +4,14 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { authService } from "@/services/auth";
-import { orderService } from "@/services/orders";
+import { getSession, getProfile, signOut } from "@/services/auth";
+import { getUserOrders } from "@/services/orders";
 import {
   User,
   ShoppingBag,
-  MapPin,
   LogOut,
   Loader2,
-  ChevronRight,
   Package,
-  Calendar,
-  Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -35,14 +31,14 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { data: { session } } = await authService.getSession();
+      const { data: { session } } = await getSession();
       if (!session) {
         window.location.href = "/login";
         return;
       }
 
-      const { data: profileData } = await authService.getProfile(session.user.id);
-      const { data: ordersData } = await orderService.getUserOrders();
+      const { data: profileData } = await getProfile(session.user.id);
+      const { data: ordersData } = await getUserOrders();
 
       setProfile(profileData);
       setOrders(ordersData || []);
@@ -51,6 +47,11 @@ export default function ProfilePage() {
 
     fetchUserData();
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = "/login";
+  };
 
   if (loading) {
     return (
@@ -88,12 +89,12 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center gap-3 text-sm text-neutral-400">
                   <Package className="w-4 h-4 text-primary" />
-                  <span>Member since {new Date(profile?.created_at).toLocaleDateString()}</span>
+                  <span>Member since {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </div>
 
               <button
-                onClick={() => authService.signOut()}
+                onClick={handleSignOut}
                 className="w-full bg-red-500/10 text-red-500 font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-red-500/20 transition-all text-xs uppercase tracking-widest"
               >
                 <LogOut className="w-4 h-4" /> Sign Out

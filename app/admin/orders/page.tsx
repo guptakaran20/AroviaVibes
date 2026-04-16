@@ -3,17 +3,15 @@
 import React, { useState, useEffect } from "react";
 import { 
   Search, 
-  ShoppingBag, 
   Clock, 
   CheckCircle2, 
   Truck, 
   XCircle,
-  Eye,
-  MoreHorizontal,
   Loader2
 } from "lucide-react";
-import { orderService } from "@/services/orders";
+import { getAllOrders, updateOrderStatus } from "@/services/orders";
 import { cn } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 const statusMap = {
   pending: { label: "Pending", icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10" },
@@ -35,20 +33,26 @@ export default function AdminOrders() {
 
   const fetchOrders = async () => {
     setLoading(true);
-    const { data } = await orderService.getAllOrders();
+    const { data } = await getAllOrders();
     setOrders(data || []);
     setLoading(false);
   };
 
   const handleStatusUpdate = async (id: string, status: string) => {
-    await orderService.updateOrderStatus(id, status);
-    fetchOrders();
+    const { error } = await updateOrderStatus(id, status);
+    if (error) {
+      toast.error('Failed to update order status');
+    } else {
+      toast.success(`Order status updated to ${status}`);
+      fetchOrders();
+    }
   };
 
   const filteredOrders = orders.filter(o => 
-    o.tracking_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    o.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    o.tracking_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    o.customer_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     o.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    o.pincode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     o.address?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -116,6 +120,9 @@ export default function AdminOrders() {
                           <p className="text-[10px] text-neutral-500 leading-tight max-w-[200px] break-words">
                             {order.address}
                           </p>
+                          {order.pincode && (
+                            <p className="text-[10px] text-primary font-bold">PIN: {order.pincode}</p>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs text-neutral-400">

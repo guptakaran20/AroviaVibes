@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { authService } from "@/services/auth";
+import { signIn } from "@/services/auth";
 import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 
 export default function LoginForm() {
@@ -25,7 +25,7 @@ export default function LoginForm() {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await authService.signIn(
+    const { error } = await signIn(
       formData.email,
       formData.password
     );
@@ -76,6 +76,11 @@ export default function LoginForm() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
+              </div>
+              <div className="flex justify-end">
+                <a href="/forgot-password" className="text-[10px] uppercase tracking-widest text-neutral-500 hover:text-primary transition-colors">
+                  Forgot Password?
+                </a>
               </div>
             </div>
 

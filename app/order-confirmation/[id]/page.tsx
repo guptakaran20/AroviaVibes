@@ -106,13 +106,14 @@ export default function OrderConfirmationPage() {
                        <p className="text-sm uppercase tracking-widest">{order.customer.phone}</p>
                     </div>
                  </div>
-                 <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-4">
                     <MapPin className="w-5 h-5 text-neutral-500 mt-1" />
                     <div className="space-y-1">
-                       <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Address</p>
+                       <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Address & PIN</p>
                        <p className="text-sm uppercase tracking-widest leading-relaxed">{order.customer.address}</p>
+                       <p className="text-sm tracking-widest font-bold">PIN: {order.customer.pincode}</p>
                     </div>
-                 </div>
+                  </div>
               </div>
            </div>
         </div>

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { orderService } from "@/services/orders";
+import { getOrderById, cancelOrder } from "@/services/orders";
 import { StatusBadge } from "@/components/account/StatusBadge";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
 import { formatDate, formatCurrency } from "@/lib/format";
@@ -37,7 +37,7 @@ export default function OrderDetails() {
 
   const fetchOrder = async () => {
     setLoading(true);
-    const { data, error: fetchError } = await orderService.getOrderById(id as string);
+    const { data, error: fetchError } = await getOrderById(id as string);
     if (fetchError) {
       setError(fetchError === "NOT_FOUND" ? "Order not found" : "Failed to load order details");
     } else {
@@ -58,7 +58,7 @@ export default function OrderDetails() {
     setOrder({ ...order, order_status: "cancelled" });
     setIsCancelling(true);
 
-    const { error: cancelError } = await orderService.cancelOrder(order.id);
+    const { error: cancelError } = await cancelOrder(order.id);
     
     setIsCancelling(false);
     if (cancelError) {
@@ -226,7 +226,10 @@ export default function OrderDetails() {
                 <div className="space-y-1">
                   <p className="text-sm font-bold text-white uppercase">{order.customer_name}</p>
                   <p className="text-xs text-neutral-400 leading-relaxed font-medium">{order.address}</p>
-                  <p className="text-xs text-neutral-400 font-medium">Contact: {order.phone}</p>
+                  {order.pincode && (
+                    <p className="text-xs text-primary font-bold">PIN: {order.pincode}</p>
+                  )}
+                  <p className="text-xs text-neutral-400 font-medium pt-1">Contact: {order.phone}</p>
                 </div>
               </div>
 

@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { orderService } from "@/services/orders";
-import { authService } from "@/services/auth";
+import { getUserOrders } from "@/services/orders";
 import { StatusBadge } from "@/components/account/StatusBadge";
 import { OrderSkeleton } from "@/components/account/OrderSkeleton";
 import { formatDate, formatCurrency } from "@/lib/format";
@@ -19,7 +18,7 @@ export default function OrderHistory() {
   const fetchOrders = async () => {
     setLoading(true);
     setError(null);
-    const { data, error: fetchError } = await orderService.getUserOrders(1, 20);
+    const { data, error: fetchError } = await getUserOrders(1, 20);
     
     if (fetchError) {
       setError(fetchError === "UNAUTHORIZED" ? "Please login to view orders" : "Failed to load orders");

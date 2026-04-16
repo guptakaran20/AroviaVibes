@@ -1,32 +1,41 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
   Package, 
   ShoppingBag, 
-  Users, 
-  Settings, 
   LogOut,
-  ChevronLeft,
   Menu,
   X
+} from "lucide-react"; // Wait, lucide-react? The existing code had lucide-react. I'll stick to that.
+import { 
+  LayoutDashboard as DashboardIcon, 
+  Package as PackageIcon, 
+  ShoppingBag as OrdersIcon, 
+  LogOut as LogOutIcon,
+  Menu as MenuIcon,
+  X as XIcon
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { authService } from "@/services/auth";
+import { signOut } from "@/services/auth";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
-  { icon: Package, label: "Products", href: "/admin/products" },
-  { icon: ShoppingBag, label: "Orders", href: "/admin/orders" },
+  { icon: DashboardIcon, label: "Dashboard", href: "/admin" },
+  { icon: PackageIcon, label: "Products", href: "/admin/products" },
+  { icon: OrdersIcon, label: "Orders", href: "/admin/orders" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.href = "/login";
+  };
 
   return (
     <div className="min-h-screen bg-black text-white flex">
@@ -43,7 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="text-primary italic whitespace-nowrap">Arovia Vibes</span> Admin
             </Link>
             <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-neutral-500">
-              <X className="w-6 h-6" />
+              <XIcon className="w-6 h-6" />
             </button>
           </div>
 
@@ -71,10 +80,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="mt-auto space-y-4">
             <div className="h-[1px] bg-white/5 w-full" />
             <button 
-              onClick={() => authService.signOut()}
+              onClick={handleSignOut}
               className="flex items-center gap-3 px-4 py-3 text-sm text-neutral-400 hover:text-red-500 transition-colors w-full"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOutIcon className="w-5 h-5" />
               Sign Out
             </button>
           </div>
@@ -89,7 +98,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onClick={() => setIsSidebarOpen(true)}
             className={cn("lg:hidden text-neutral-400", isSidebarOpen && "hidden")}
           >
-            <Menu className="w-6 h-6" />
+            <MenuIcon className="w-6 h-6" />
           </button>
           
           <div className="flex items-center gap-4 ml-auto">

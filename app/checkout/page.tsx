@@ -7,10 +7,10 @@ import { Footer } from "@/components/layout/Footer";
 import { useCart } from "@/context/CartContext";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { ShieldCheck, Truck, CreditCard, Banknote, Loader2 } from "lucide-react";
+import { ShieldCheck, Truck, CreditCard, Banknote } from "lucide-react";
 import toast from "react-hot-toast";
-import { orderService } from "@/services/orders";
-import { authService } from "@/services/auth";
+import { createOrder } from "@/services/orders";
+import { getSession, ensureProfile, updateProfile } from "@/services/auth";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -21,13 +21,14 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    pincode: "",
     address: "",
     paymentMethod: "COD" as "COD" | "UPI",
   });
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await authService.getSession();
+      const { data: { session } } = await getSession();
       if (!session) {
         toast.error("Please login to complete your order");
         router.push(`/login?redirect=/checkout`);
@@ -35,10 +36,16 @@ export default function CheckoutPage() {
       }
       setUserId(session.user.id);
       
-      // Auto-fill name if profile exists
-      const { data: profile } = await authService.getProfile(session.user.id);
-      if (profile?.name) {
-        setFormData(prev => ({ ...prev, name: profile.name }));
+      // Auto-fill name if profile exists or metadata exists
+      const { data: profile } = await ensureProfile(session.user.id, session.user.user_metadata);
+      const nameFallback = profile?.name || session.user.user_metadata?.full_name || session.user.user_metadata?.name || "";
+      
+      if (nameFallback || profile?.pincode) {
+        setFormData(prev => ({ 
+          ...prev, 
+          name: nameFallback,
+          pincode: profile?.pincode || "" 
+        }));
       }
     };
     checkAuth();
@@ -61,26 +68,33 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (!formData.name || !formData.phone || !formData.address) {
+    if (!formData.name || !formData.phone || !formData.address || !formData.pincode) {
       toast.error("Please provide all delivery details");
+      return;
+    }
+
+    if (formData.pincode.length !== 6 || !/^\d+$/.test(formData.pincode)) {
+      toast.error("Please provide a valid 6-digit PIN code");
       return;
     }
 
     setIsSubmitting(true);
 
-    const { data: order, error } = await orderService.createOrder({
+    const { data: order, error } = await createOrder({
       user_id: userId,
       customer_name: formData.name,
       phone: formData.phone,
       address: formData.address,
+      pincode: formData.pincode,
       payment_method: formData.paymentMethod,
       total_amount: finalTotal,
       items: cart,
     });
 
-    setIsSubmitting(false);
-
     if (!error && order) {
+      // Save pincode to profile for future use
+      await updateProfile(userId, { pincode: formData.pincode });
+      
       clearCart();
       router.push(`/order-confirmation?tracking=${order.tracking_id}`);
     }
@@ -139,8 +153,24 @@ export default function CheckoutPage() {
                   rows={4}
                   value={formData.address}
                   onChange={e => setFormData({...formData, address: e.target.value})}
-                  placeholder="Street address, Apartment, City, State, PIN Code"
+                  placeholder="Street address, Apartment, City, State"
                   className="w-full bg-neutral-900 border border-white/10 p-4 text-white focus:border-primary outline-none transition-colors resize-none"
+                />
+              </div>
+
+              <div className="space-y-2 max-w-xs">
+                <label className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">PIN Code (6 Digits)</label>
+                <input 
+                  type="text" 
+                  required
+                  maxLength={6}
+                  value={formData.pincode}
+                  onChange={e => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    if (val.length <= 6) setFormData({...formData, pincode: val});
+                  }}
+                  placeholder="400001"
+                  className="w-full bg-neutral-900 border border-white/10 p-4 text-white focus:border-primary outline-none transition-colors"
                 />
               </div>
             </section>
@@ -213,9 +243,15 @@ export default function CheckoutPage() {
                  <p className="text-[10px] text-neutral-500 uppercase tracking-widest italic text-center">Tax and shipping included</p>
               </div>
 
-              <Button type="submit" className="w-full h-14 flex items-center justify-center space-x-3" size="lg">
-                 <span>Place Order</span>
-                 <ShieldCheck className="w-5 h-5" />
+              <Button type="submit" disabled={isSubmitting} className="w-full h-14 flex items-center justify-center space-x-3" size="lg">
+                 {isSubmitting ? (
+                   <Loader2 className="w-5 h-5 animate-spin" />
+                 ) : (
+                   <>
+                     <span>Place Order</span>
+                     <ShieldCheck className="w-5 h-5" />
+                   </>
+                 )}
               </Button>
             </div>
 
@@ -237,3 +273,20 @@ export default function CheckoutPage() {
     </main>
   );
 }
+
+const Loader2 = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+);

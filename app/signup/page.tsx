@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { authService } from "@/services/auth";
+import { signUp } from "@/services/auth";
 import { Loader2, User, Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function SignupPage() {
@@ -26,7 +26,7 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-    const { error } = await authService.signUp(formData.email, formData.password, formData.name);
+    const { error } = await signUp(formData.email, formData.password, formData.name);
     setLoading(false);
 
     if (!error) {

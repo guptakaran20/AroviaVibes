@@ -6,7 +6,7 @@ import { Search, ShoppingBag, Menu, X, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { authService } from "@/services/auth";
+import { getSession } from "@/services/auth";
 
 export const Navbar = () => {
   const { cartCount } = useCart();
@@ -20,8 +20,8 @@ export const Navbar = () => {
     };
     window.addEventListener("scroll", handleScroll);
     
-    authService.getSession().then(({ data }) => {
-      setSession(data.session);
+    getSession().then(({ data }) => {
+      setSession(data?.session || null);
     });
 
     return () => window.removeEventListener("scroll", handleScroll);
