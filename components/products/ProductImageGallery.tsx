@@ -84,7 +84,7 @@ export const ProductImageGallery = ({ images: initialImages }: ProductImageGalle
               src={images[currentIndex]}
               alt={`Product image ${currentIndex + 1}`}
               fill
-              className="object-cover select-none"
+              className="object-contain p-6 select-none"
               priority
               draggable={false}
             />

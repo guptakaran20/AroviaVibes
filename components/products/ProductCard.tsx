@@ -36,7 +36,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               alt={product.name}
               fill
               className={cn(
-                "object-cover transition-transform duration-700 group-hover:scale-110",
+                "object-contain p-4 transition-transform duration-700 group-hover:scale-105",
                 isHovered && (product.images?.[1] || product.secondary_image_url) ? "opacity-0" : "opacity-100"
               )}
               onError={(e) => {
@@ -58,7 +58,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                 alt={product.name}
                 fill
                 className={cn(
-                  "object-cover transition-all duration-700 group-hover:scale-110",
+                  "object-contain p-4 transition-transform duration-700 group-hover:scale-105",
                   isHovered ? "opacity-100 scale-110" : "opacity-0"
                 )}
               />
