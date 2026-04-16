@@ -47,7 +47,9 @@ export default function AdminOrders() {
 
   const filteredOrders = orders.filter(o => 
     o.tracking_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    o.customer_name.toLowerCase().includes(searchQuery.toLowerCase())
+    o.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    o.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    o.address?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -109,8 +111,11 @@ export default function AdminOrders() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="space-y-1">
-                          <p className="text-sm text-white">{order.customer_name}</p>
-                          <p className="text-[10px] text-neutral-500">{order.phone}</p>
+                          <p className="text-sm text-white font-medium">{order.customer_name}</p>
+                          <p className="text-[10px] text-neutral-400 font-mono">{order.phone}</p>
+                          <p className="text-[10px] text-neutral-500 leading-tight max-w-[200px] break-words">
+                            {order.address}
+                          </p>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs text-neutral-400">
