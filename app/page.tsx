@@ -2,6 +2,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Hero } from "@/components/home/Hero";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { Footer } from "@/components/layout/Footer";
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function Home() {
   return (
@@ -9,6 +11,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <FeaturedProducts />
+      <Analytics />
+      <SpeedInsights />
       
       {/* Promotion Section */}
       <section className="py-24 bg-neutral-900 overflow-hidden">
