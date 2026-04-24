@@ -48,13 +48,23 @@ export default function AdminOrders() {
     }
   };
 
-  const filteredOrders = orders.filter(o => 
-    o.tracking_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    o.customer_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    o.phone?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    o.pincode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    o.address?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOrders = orders.filter(o => {
+    const searchStr = searchQuery.toLowerCase();
+    const customerMatch = 
+      o.tracking_id?.toLowerCase().includes(searchStr) ||
+      o.customer_name?.toLowerCase().includes(searchStr) ||
+      o.phone?.toLowerCase().includes(searchStr) ||
+      o.pincode?.toLowerCase().includes(searchStr) ||
+      o.address?.toLowerCase().includes(searchStr);
+    
+    const items = o.items || o.order_items;
+    const productMatch = items?.some((item: any) => {
+      const product = item.product || item.products;
+      return product?.name?.toLowerCase().includes(searchStr);
+    });
+
+    return customerMatch || productMatch;
+  });
 
   return (
     <div className="space-y-8">
@@ -110,7 +120,13 @@ export default function AdminOrders() {
                       <td className="px-6 py-4">
                         <div className="space-y-1">
                           <p className="text-sm font-bold text-white uppercase">{order.tracking_id}</p>
-                          <p className="text-[10px] text-neutral-500">{order.order_items?.length} items</p>
+                          {(order.items?.[0]?.product?.name || order.order_items?.[0]?.products?.name) && (
+                            <p className="text-[11px] text-primary font-medium line-clamp-1">
+                              {order.items?.[0]?.product?.name || order.order_items?.[0]?.products?.name}
+                              {(order.items?.length || order.order_items?.length || 0) > 1 && ` + ${(order.items?.length || order.order_items?.length) - 1} more`}
+                            </p>
+                          )}
+                          <p className="text-[10px] text-neutral-500">{order.items?.length || order.order_items?.length || 0} items</p>
                         </div>
                       </td>
                       <td className="px-6 py-4">

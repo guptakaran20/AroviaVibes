@@ -131,7 +131,7 @@ export async function getAllOrders() {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, products(*))')
+    .select('*, items:order_items(*, product:products(*))')
     .order('created_at', { ascending: false })
 
   return { data, error }
