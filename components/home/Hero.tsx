@@ -48,18 +48,10 @@ export const Hero = () => {
             Discover our curated collection of artisanal fragrances. Each bottle 
             is a journey through sophisticated notes designed for the modern individual.
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.8 }}
-            className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
-          >
-            <Button size="lg" className="flex items-center space-x-2">
+          <Button size="lg" className="flex items-center space-x-2">
               <Link href="/shop">Explore Collections</Link>
               <ArrowRight className="w-5 h-5" />
             </Button>
-          </motion.div>
         </div>
       </div>
 

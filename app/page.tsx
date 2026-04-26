@@ -13,7 +13,7 @@ export default function Home() {
       <FeaturedProducts />
       <Analytics />
       <SpeedInsights />
-      
+
       {/* Promotion Section */}
       <section className="py-24 bg-neutral-900 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
@@ -24,7 +24,7 @@ export default function Home() {
                 Sensory <br /> <span className="text-primary italic">Gift Sets</span>
               </h2>
               <p className="text-neutral-400 text-lg leading-relaxed max-w-md">
-                Experience the complete range with our curated gift sets. 
+                Experience the complete range with our curated gift sets.
                 The perfect present for yourself or someone special.
               </p>
               <div className="pt-4">
@@ -33,8 +33,35 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <div className="relative h-[500px] md:h-[700px]">
-              <iframe src='https://my.spline.design/theperfume-YZaNL4Lw473ywUAmmjU0dRBJ/' width='100%' height='100%'></iframe>
+            <div className="relative w-full h-[500px] md:h-[700px] flex items-center justify-center md:justify-end bg-[#0b0b0c] overflow-hidden">
+
+              {/* Gradient BEHIND image (important fix) */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0c] via-[#0b0b0c]/80 to-transparent" />
+
+              {/* Image */}
+              <img
+                src="./hero1.png"
+                alt="Gift Set"
+                className="
+      relative z-10
+      w-[95%] sm:w-[80%] md:w-[70%] lg:w-[60%]
+      object-contain
+
+      /* 3D depth */
+      drop-shadow-[0_50px_120px_rgba(0,0,0,0.9)]
+
+      /* smoother presence */
+      opacity-100
+
+      /* REAL edge fade (stronger) */
+      [mask-image:radial-gradient(circle_at_center,black_55%,transparent_100%)]
+      md:[mask-image:linear-gradient(to_left,black_60%,transparent_100%)]
+
+      /* subtle zoom */
+      scale-105 md:scale-110
+    "
+              />
+
             </div>
           </div>
         </div>
@@ -45,30 +72,30 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="relative group h-[500px] overflow-hidden">
-               <img 
-                 src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=1000" 
-                 alt="Women Collection"
-                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-               />
-               <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center space-y-4">
-                  <h3 className="text-4xl font-serif tracking-widest text-white">FOR HER</h3>
-                  <a href="/shop?category=Women" className="text-primary border-b border-primary text-sm uppercase tracking-widest hover:text-white hover:border-white transition-colors pb-1">
-                    Discover Collection
-                  </a>
-               </div>
+              <img
+                src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=1000"
+                alt="Women Collection"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center space-y-4">
+                <h3 className="text-4xl font-serif tracking-widest text-white">FOR HER</h3>
+                <a href="/shop?category=Women" className="text-primary border-b border-primary text-sm uppercase tracking-widest hover:text-white hover:border-white transition-colors pb-1">
+                  Discover Collection
+                </a>
+              </div>
             </div>
             <div className="relative group h-[500px] overflow-hidden">
-               <img 
-                 src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80&w=1000" 
-                 alt="Men Collection"
-                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-               />
-               <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center space-y-4">
-                  <h3 className="text-4xl font-serif tracking-widest text-white">FOR HIM</h3>
-                  <a href="/shop?category=Men" className="text-primary border-b border-primary text-sm uppercase tracking-widest hover:text-white hover:border-white transition-colors pb-1">
-                    Discover Collection
-                  </a>
-               </div>
+              <img
+                src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?auto=format&fit=crop&q=80&w=1000"
+                alt="Men Collection"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center space-y-4">
+                <h3 className="text-4xl font-serif tracking-widest text-white">FOR HIM</h3>
+                <a href="/shop?category=Men" className="text-primary border-b border-primary text-sm uppercase tracking-widest hover:text-white hover:border-white transition-colors pb-1">
+                  Discover Collection
+                </a>
+              </div>
             </div>
           </div>
         </div>
