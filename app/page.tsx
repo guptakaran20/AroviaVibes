@@ -16,63 +16,56 @@ export default function Home() {
       <SpeedInsights />
 
       {/* Promotion Section */}
-     {/* Promotion Section */}
-<section className="py-24 bg-neutral-900 overflow-hidden">
-  <div className="max-w-7xl mx-auto px-6">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-      <div className="space-y-8">
-        <span className="text-primary uppercase tracking-luxury text-xs font-bold">Exclusive Offer</span>
-        <h2 className="text-5xl md:text-7xl font-serif tracking-tight leading-tight">
-          Sensory <br /> <span className="text-primary italic">Gift Sets</span>
-        </h2>
-        <p className="text-neutral-400 text-lg leading-relaxed max-w-md">
-          Experience the complete range with our curated gift sets.
-          The perfect present for yourself or someone special.
-        </p>
-        <div className="pt-4">
+      <section className="py-24 bg-background relative overflow-hidden">
+        {/* Section Header Logo */}
+
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <span className="text-primary uppercase tracking-[0.4em] text-[10px] font-bold block">Exclusive Offer</span>
+                <h2 className="text-6xl md:text-8xl font-serif leading-[1.1] tracking-normal">
+                  Sensory <br /> 
+                  <span className="text-primary italic font-light">Gift Sets</span>
+                </h2>
+              </div>
+              
+              <p className="text-neutral-400 text-lg leading-relaxed max-w-md font-light">
+                Experience the complete range with our curated gift sets.
+                The perfect present for yourself or someone special.
+              </p>
+              
+              <div className="pt-4">
           <a href="/shop" className="inline-block bg-primary text-background px-8 py-4 uppercase tracking-widest text-sm font-bold hover:bg-primary-dark transition-colors">
-            Shop Gift Sets
-          </a>
+                  Shop Gift Sets
+                </a>
+              </div>
+            </div>
+
+            {/* Right image panel with spotlight effect */}
+            <div className="relative w-full h-[500px] md:h-[700px] flex items-center justify-center">
+              {/* Spotlight Background */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(189,168,127,0.08)_0%,transparent_70%)] pointer-events-none" />
+              
+              <div className="relative w-full h-full group">
+                <img
+                  src="/hh.png"
+                  alt="Gift Set"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 w-[95%] md:w-[90%] object-contain z-10 drop-shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-transform duration-700 group-hover:scale-105"
+                />
+                
+                {/* Subtle edge masks for seamless integration */}
+                <div className="absolute inset-0 z-20 pointer-events-none"
+                  style={{
+                    background: "linear-gradient(to right, #0a0a0a 5%, transparent 25%, transparent 75%, #0a0a0a 95%)"
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Right image panel */}
-      {/* Right image panel */}
-<div className="relative w-full h-[500px] md:h-[700px] bg-neutral-900 overflow-hidden flex items-center justify-center">
-  
-  {/* Plain img — full control over mask */}
-  <img
-    src="/hh.png"
-    alt="Gift Set"
-    className="absolute right-0 top-1/2 -translate-y-1/2 w-[90%] md:w-[85%] object-contain"
-    style={{
-      maskImage: `
-        linear-gradient(to left,  black 50%, transparent 90%),
-        linear-gradient(to bottom, black 60%, transparent 95%),
-        linear-gradient(to top,   black 60%, transparent 95%)
-      `,
-      WebkitMaskImage: `
-        linear-gradient(to left,  black 50%, transparent 90%),
-        linear-gradient(to bottom, black 60%, transparent 95%),
-        linear-gradient(to top,   black 60%, transparent 95%)
-      `,
-      maskComposite: "intersect",
-      WebkitMaskComposite: "source-in",
-    }}
-  />
-
-  {/* Left edge gradient to blend into text column */}
-  <div
-    className="absolute inset-y-0 left-0 w-1/2 pointer-events-none z-10"
-    style={{
-      background: "linear-gradient(to right, #171717 20%, transparent 100%)",
-    }}
-  />
-</div>
-
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* Category Section */}
       <section className="py-24 bg-background">
