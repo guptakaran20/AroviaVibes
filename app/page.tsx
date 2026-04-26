@@ -4,6 +4,7 @@ import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { Footer } from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -39,29 +40,26 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0c] via-[#0b0b0c]/80 to-transparent" />
 
               {/* Image */}
-              <img
-                src="./hero1.png"
-                alt="Gift Set"
-                className="
-      relative z-10
-      w-[95%] sm:w-[80%] md:w-[70%] lg:w-[60%]
+               <Image
+    src="/hero1.png"
+    alt="Gift Set"
+    fill
+    priority
+    className="
       object-contain
+
+      /* control size manually */
+      w-[95%] sm:w-[80%] md:w-[70%] lg:w-[60%] ml-auto
 
       /* 3D depth */
       drop-shadow-[0_50px_120px_rgba(0,0,0,0.9)]
 
-      /* smoother presence */
-      opacity-100
+      /* blending */
+      [mask-image:linear-gradient(to_left,black_60%,transparent_100%)]
 
-      /* REAL edge fade (stronger) */
-      [mask-image:radial-gradient(circle_at_center,black_55%,transparent_100%)]
-      md:[mask-image:linear-gradient(to_left,black_60%,transparent_100%)]
-
-      /* subtle zoom */
       scale-105 md:scale-110
     "
-              />
-
+  />
             </div>
           </div>
         </div>
