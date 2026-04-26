@@ -41,7 +41,7 @@ export default function Home() {
 
               {/* Image */}
                <Image
-    src="/hero1.png"
+    src="/hh.png"
     alt="Gift Set"
     fill
     priority
