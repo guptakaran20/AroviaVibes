@@ -16,54 +16,63 @@ export default function Home() {
       <SpeedInsights />
 
       {/* Promotion Section */}
-      <section className="py-24 bg-neutral-900 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-8">
-              <span className="text-primary uppercase tracking-luxury text-xs font-bold">Exclusive Offer</span>
-              <h2 className="text-5xl md:text-7xl font-serif tracking-tight leading-tight">
-                Sensory <br /> <span className="text-primary italic">Gift Sets</span>
-              </h2>
-              <p className="text-neutral-400 text-lg leading-relaxed max-w-md">
-                Experience the complete range with our curated gift sets.
-                The perfect present for yourself or someone special.
-              </p>
-              <div className="pt-4">
-                <a href="/shop" className="inline-block bg-primary text-background px-8 py-4 uppercase tracking-widest text-sm font-bold hover:bg-primary-dark transition-colors">
-                  Shop Gift Sets
-                </a>
-              </div>
-            </div>
-            <div className="relative w-full h-[500px] md:h-[700px] flex items-center justify-center md:justify-end bg-[#0b0b0c] overflow-hidden">
+     {/* Promotion Section */}
+<section className="py-24 bg-neutral-900 overflow-hidden">
+  <div className="max-w-7xl mx-auto px-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div className="space-y-8">
+        <span className="text-primary uppercase tracking-luxury text-xs font-bold">Exclusive Offer</span>
+        <h2 className="text-5xl md:text-7xl font-serif tracking-tight leading-tight">
+          Sensory <br /> <span className="text-primary italic">Gift Sets</span>
+        </h2>
+        <p className="text-neutral-400 text-lg leading-relaxed max-w-md">
+          Experience the complete range with our curated gift sets.
+          The perfect present for yourself or someone special.
+        </p>
+        <div className="pt-4">
+          <a href="/shop" className="inline-block bg-primary text-background px-8 py-4 uppercase tracking-widest text-sm font-bold hover:bg-primary-dark transition-colors">
+            Shop Gift Sets
+          </a>
+        </div>
+      </div>
 
-              {/* Gradient BEHIND image (important fix) */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0b0b0c] via-[#0b0b0c]/80 to-transparent" />
-
-              {/* Image */}
-               <Image
+      {/* Right image panel */}
+      {/* Right image panel */}
+<div className="relative w-full h-[500px] md:h-[700px] bg-neutral-900 overflow-hidden flex items-center justify-center">
+  
+  {/* Plain img — full control over mask */}
+  <img
     src="/hh.png"
     alt="Gift Set"
-    fill
-    priority
-    className="
-      object-contain
-
-      /* control size manually */
-      w-[95%] sm:w-[80%] md:w-[70%] lg:w-[60%] ml-auto
-
-      /* 3D depth */
-      drop-shadow-[0_50px_120px_rgba(0,0,0,0.9)]
-
-      /* blending */
-      [mask-image:linear-gradient(to_left,black_60%,transparent_100%)]
-
-      scale-105 md:scale-110
-    "
+    className="absolute right-0 top-1/2 -translate-y-1/2 w-[90%] md:w-[85%] object-contain"
+    style={{
+      maskImage: `
+        linear-gradient(to left,  black 50%, transparent 90%),
+        linear-gradient(to bottom, black 60%, transparent 95%),
+        linear-gradient(to top,   black 60%, transparent 95%)
+      `,
+      WebkitMaskImage: `
+        linear-gradient(to left,  black 50%, transparent 90%),
+        linear-gradient(to bottom, black 60%, transparent 95%),
+        linear-gradient(to top,   black 60%, transparent 95%)
+      `,
+      maskComposite: "intersect",
+      WebkitMaskComposite: "source-in",
+    }}
   />
-            </div>
-          </div>
-        </div>
-      </section>
+
+  {/* Left edge gradient to blend into text column */}
+  <div
+    className="absolute inset-y-0 left-0 w-1/2 pointer-events-none z-10"
+    style={{
+      background: "linear-gradient(to right, #171717 20%, transparent 100%)",
+    }}
+  />
+</div>
+
+    </div>
+  </div>
+</section>
 
       {/* Category Section */}
       <section className="py-24 bg-background">
